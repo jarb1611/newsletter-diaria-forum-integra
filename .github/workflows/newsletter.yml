@@ -1,0 +1,56 @@
+name: Newsletter Diária - Fórum Integra
+
+on:
+  schedule:
+    - cron: "30 12 * * 1-5"
+  workflow_dispatch: {}
+
+jobs:
+  gerar-e-enviar-newsletter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Rodar o agente da newsletter
+        working-directory: src
+        run: python main.py
+
+      - name: Ler o conteúdo da mensagem gerada
+        id: ler_mensagem
+        working-directory: src
+        run: |
+          ARQUIVO=$(ls -t saidas/*.txt | head -n 1)
+          echo "Lendo arquivo: $ARQUIVO"
+          {
+            echo 'conteudo<<EOF_NEWSLETTER'
+            cat "$ARQUIVO"
+            echo 'EOF_NEWSLETTER'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Enviar por e-mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "Newsletter Diária - Fórum Integra"
+          to: contato@forumintegra.org
+          from: "Newsletter Fórum Integra"
+          body: ${{ steps.ler_mensagem.outputs.conteudo }}
+
+      - name: Salvar a mensagem como artefato (backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsletter-do-dia
+          path: src/saidas/*.txt
+          retention-days: 30
