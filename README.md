@@ -63,6 +63,30 @@ config.py (categorias, termos, janela de tempo, meta)
 - **Meta de notícias:** a busca **para automaticamente** assim que atingir `META_TOTAL_NOTICIAS` (padrão: 10) — não continua buscando os termos restantes.
 - **Encurtamento de link:** feito só nas notícias finais selecionadas (não nas descartadas), usando a API gratuita do TinyURL. Se o serviço estiver fora do ar, o link original é usado sem quebrar o pipeline.
 
+## Agendamento automático (GitHub Actions)
+
+O arquivo `.github/workflows/newsletter.yml` roda a newsletter automaticamente **de segunda a sexta-feira, às 09:30 (horário de Brasília)**, e envia o resultado por e-mail para `contato@forumintegra.org` — sem depender do Google Colab, sem assinatura paga, direto na nuvem do GitHub.
+
+Para funcionar, é necessário configurar 4 *secrets* no repositório (credenciais de e-mail) — veja o passo a passo completo na seção de configuração do repositório, mais abaixo.
+
+## Como configurar o envio automático por e-mail
+
+1. No repositório do GitHub, vá em **Settings → Secrets and variables → Actions → New repository secret**
+2. Crie os seguintes secrets, um de cada vez:
+
+| Nome do secret | O que colocar |
+|---|---|
+| `MAIL_SERVER` | Endereço SMTP do seu provedor de e-mail (ex: `smtp.gmail.com`) |
+| `MAIL_PORT` | Porta SMTP (geralmente `465`) |
+| `MAIL_USERNAME` | O e-mail usado para autenticar o envio |
+| `MAIL_PASSWORD` | Senha de app (não a senha normal da conta, veja nota abaixo) |
+
+3. Pronto — o workflow já está configurado para rodar automaticamente. Você também pode testá-lo manualmente a qualquer momento em **Actions → Newsletter Diária - Fórum Integra → Run workflow**, sem precisar esperar o horário agendado.
+
+**Nota sobre senha:** a maioria dos provedores de e-mail (Gmail, Google Workspace, Outlook) não aceita mais a senha normal da conta para envio via SMTP por scripts — é necessário gerar uma **senha de app** específica nas configurações de segurança da conta. Se `contato@forumintegra.org` for uma conta do Google Workspace, o processo é o mesmo do Gmail pessoal (Conta Google → Segurança → Senhas de app), desde que a verificação em duas etapas esteja ativada.
+
+**Limitação do GitHub Actions:** o agendamento (`cron`) é gratuito, mas o GitHub não garante o horário exato ao segundo — pode haver alguns minutos de atraso em horários de pico. Além disso, se o repositório ficar 60 dias sem nenhuma atividade (commits, etc.), o GitHub desativa automaticamente os agendamentos por segurança — nesse caso, basta reativar em **Actions**.
+
 ## Como usar
 
 ```bash
