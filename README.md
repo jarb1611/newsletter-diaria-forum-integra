@@ -39,18 +39,24 @@ config.py (categorias, termos, janela de tempo, meta)
 │  atingir_meta()       │    foi coletado)
 └──────────┬───────────┘  PARA assim que atingir a meta (ex: 10 notícias)
            ▼
-┌─────────────────────┐  Encurta os links das notícias finais usando a
-│  2. Encurtador        │  API pública e gratuita do TinyURL (sem chave).
-│  encurtador.py        │  Se falhar, mantém o link original (fallback).
+┌─────────────────────┐  Decodifica o link "embrulhado" do Google
+│  2. Resolvedor de     │  Notícias, entregando a URL real da matéria
+│     Link              │  (ex: g1.globo.com/...).
+│  resolver_link.py     │
+└──────────┬───────────┘
+           ▼
+┌─────────────────────┐  (Opcional, desativado por padrão) Encurta os
+│  3. Encurtador        │  links via TinyURL. Se falhar, mantém o link
+│  encurtador.py        │  original (fallback).
 └──────────┬───────────┘
            ▼
 ┌─────────────────────┐  Agrupa as notícias selecionadas nas categorias
-│  3. Organizador       │  definidas em config.py.
+│  4. Organizador       │  definidas em config.py.
 │  organizador.py       │
 └──────────┬───────────┘
            ▼
 ┌─────────────────────┐  Monta a mensagem final no formato exato do seu
-│  4. Formatador        │  modelo, usando o link curto.
+│  5. Formatador        │  modelo, usando o link curto.
 │  formatador_whatsapp  │
 └──────────┬───────────┘
            ▼
@@ -96,6 +102,12 @@ python main.py
 ```
 
 O resultado aparece no terminal e também é salvo em `saidas/mensagem_whatsapp_<timestamp>.txt` — é só copiar o conteúdo e colar na conversa do WhatsApp.
+
+## Link real da matéria (sem redirecionamento do Google Notícias)
+
+O RSS do Google Notícias entrega links "embrulhados" (`news.google.com/rss/articles/...`), que escondem o domínio de destino até o clique — o mesmo problema de segurança que motivou desativar o encurtador (veja seção abaixo). Um agente adicional (`src/resolver_link.py`) decodifica automaticamente esses links, entregando a URL real da matéria (ex: `g1.globo.com/...`), usando a biblioteca open-source `googlenewsdecoder` (gratuita, sem chave de API).
+
+Se a decodificação falhar por qualquer motivo (fora do ar, rate limit), o link original do Google é mantido como fallback — o pipeline nunca quebra por causa disso.
 
 ## Segurança: links originais por padrão (proteção contra phishing)
 
