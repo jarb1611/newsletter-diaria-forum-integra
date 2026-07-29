@@ -15,20 +15,28 @@ Liga os agentes gratuitos em sequência:
         -> PARA assim que atingir a meta configurada (ex: 10 notícias)
         |
         v
-  [Agente 2] encurtador.encurtar_links_das_noticias()
-        -> encurta os links só das notícias finais selecionadas
+  [Agente 2] resolver_link.resolver_links_das_noticias()
+        -> troca o link "embrulhado" do Google Notícias pelo link real
+           da matéria (ex: g1.globo.com/...), usando a biblioteca
+           gratuita googlenewsdecoder
         |
         v
-  [Agente 3] organizador.organizar_por_categoria()
+  [Agente 3] encurtador.encurtar_links_das_noticias()
+        -> (opcional, desativado por padrão) encurta os links --
+           mantido desligado por padrão para não esconder o domínio
         |
         v
-  [Agente 4] formatador_whatsapp.gerar_mensagem_completa()
+  [Agente 4] organizador.organizar_por_categoria()
+        |
+        v
+  [Agente 5] formatador_whatsapp.gerar_mensagem_completa()
         |
         v
   arquivo .txt salvo em /saidas, pronto pra colar no WhatsApp
 
-Nenhuma etapa faz chamada a API de IA paga. O encurtador usa uma API
-pública gratuita (TinyURL), sem chave e sem custo.
+Nenhuma etapa faz chamada a API de IA paga. O resolvedor de link e o
+encurtador usam bibliotecas/serviços públicos gratuitos, sem chave e
+sem custo.
 """
 
 import os
@@ -36,6 +44,7 @@ from datetime import datetime
 
 import config
 from buscador import buscar_ate_atingir_meta
+from resolver_link import resolver_links_das_noticias
 from encurtador import encurtar_links_das_noticias
 from organizador import organizar_por_categoria
 from formatador_whatsapp import gerar_mensagem_completa
@@ -43,7 +52,7 @@ from formatador_whatsapp import gerar_mensagem_completa
 
 def executar_pipeline() -> list[str]:
     print(
-        f"[1/4] Buscando notícias das últimas {config.JANELA_HORAS_MAXIMA}h "
+        f"[1/5] Buscando notícias das últimas {config.JANELA_HORAS_MAXIMA}h "
         f"(meta: {config.META_TOTAL_NOTICIAS} notícia(s))..."
     )
     noticias_selecionadas = buscar_ate_atingir_meta(
@@ -54,16 +63,19 @@ def executar_pipeline() -> list[str]:
     )
     print(f"       -> {len(noticias_selecionadas)} notícia(s) selecionada(s).")
 
-    print(f"[2/4] Processando links (encurtador {'ativado' if config.ATIVAR_ENCURTADOR_DE_LINK else 'desativado -- usando link original'})...")
+    print("[2/5] Resolvendo o link real das matérias (removendo o redirecionamento do Google Notícias)...")
+    noticias_selecionadas = resolver_links_das_noticias(noticias_selecionadas)
+
+    print(f"[3/5] Processando links (encurtador {'ativado' if config.ATIVAR_ENCURTADOR_DE_LINK else 'desativado -- usando link original'})...")
     noticias_selecionadas = encurtar_links_das_noticias(
         noticias_selecionadas,
         ativar_encurtador=config.ATIVAR_ENCURTADOR_DE_LINK,
     )
 
-    print("[3/4] Organizando por categoria...")
+    print("[4/5] Organizando por categoria...")
     noticias_organizadas = organizar_por_categoria(noticias_selecionadas, config.CATEGORIAS_DE_BUSCA)
 
-    print("[4/4] Gerando mensagem(ns) final(is) para WhatsApp...")
+    print("[5/5] Gerando mensagem(ns) final(is) para WhatsApp...")
     mensagens = gerar_mensagem_completa(
         noticias_organizadas,
         nome_organizacao=config.NOME_ORGANIZACAO,
