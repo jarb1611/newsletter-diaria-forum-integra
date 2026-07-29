@@ -198,3 +198,19 @@ Isso funciona bem para a maioria dos casos, mas **pode deixar passar** duas not�
 ## Stack
 
 `Python` · `feedparser` (RSS) · `python-dateutil` · `difflib` (biblioteca padrão) — **zero APIs pagas, zero custo por token**
+
+## Licença
+
+Este projeto está sob a licença MIT — veja o arquivo [`LICENSE`](LICENSE) para o texto completo. Em resumo: qualquer pessoa pode usar, copiar, modificar e redistribuir este código, inclusive para fins comerciais, desde que o aviso de copyright original seja mantido.
+
+## Como citar este projeto
+
+Se este projeto for referenciado em outro trabalho (acadêmico, técnico ou institucional), a citação sugerida no padrão ABNT é:
+
+```
+BARROS, João R. Newsletter Diária de Notícias Policiais para WhatsApp. GitHub, 2026.
+Disponível em: https://github.com/jarb1611/newsletter-diaria-forum-integra.
+Acesso em: [data de acesso].
+```
+
+Este repositório também inclui um arquivo [`CITATION.cff`](CITATION.cff), reconhecido nativamente pelo GitHub — isso habilita o botão **"Cite this repository"** na página principal, que gera a citação automaticamente em formatos como APA e BibTeX.

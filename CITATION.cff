@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "Se este projeto for útil para o seu trabalho, por favor cite-o conforme abaixo."
+title: "Newsletter Diária de Notícias Policiais para WhatsApp"
+abstract: >-
+  Pipeline de agentes em Python que busca, filtra, deduplica e organiza
+  notícias sobre segurança pública em fontes abertas, gerando uma
+  newsletter diária para envio via WhatsApp — sem uso de IA generativa
+  ou APIs pagas.
+authors:
+  - family-names: "R. Barros"
+    given-names: "João"
+repository-code: "https://github.com/jarb1611/newsletter-diaria-forum-integra"
+url: "https://github.com/jarb1611/newsletter-diaria-forum-integra"
+license: MIT
+date-released: "2026-07-29"
+keywords:
+  - python
+  - automation
+  - agents
+  - rss
+  - whatsapp
+  - news-aggregator
