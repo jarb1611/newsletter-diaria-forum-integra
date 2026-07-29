@@ -97,6 +97,18 @@ python main.py
 
 O resultado aparece no terminal e também é salvo em `saidas/mensagem_whatsapp_<timestamp>.txt` — é só copiar o conteúdo e colar na conversa do WhatsApp.
 
+## Segurança: links originais por padrão (proteção contra phishing)
+
+O encurtador de links vem **desativado por padrão**. A mensagem final mostra o **link de origem completo** (ex: `g1.globo.com/...`), não um link encurtado.
+
+Motivo: links encurtados escondem o domínio de destino até o clique — uma técnica comum em golpes de phishing. Para um público que inclui agentes de segurança pública e equipes de inteligência (que, por rotina profissional, verificam o domínio antes de clicar em qualquer link), isso é uma preocupação legítima mesmo usando um encurtador confiável como o TinyURL.
+
+Para reativar o encurtamento (se preferir mensagens mais compactas e o público não tiver essa restrição), edite em `src/config.py`:
+
+```python
+ATIVAR_ENCURTADOR_DE_LINK = True
+```
+
 ## Como ajustar a busca (o que você vai mexer com frequência)
 
 Edite **`src/config.py`**. Cada categoria é uma lista de termos de busca:

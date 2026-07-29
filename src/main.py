@@ -54,8 +54,11 @@ def executar_pipeline() -> list[str]:
     )
     print(f"       -> {len(noticias_selecionadas)} notícia(s) selecionada(s).")
 
-    print("[2/4] Encurtando links...")
-    noticias_selecionadas = encurtar_links_das_noticias(noticias_selecionadas)
+    print(f"[2/4] Processando links (encurtador {'ativado' if config.ATIVAR_ENCURTADOR_DE_LINK else 'desativado -- usando link original'})...")
+    noticias_selecionadas = encurtar_links_das_noticias(
+        noticias_selecionadas,
+        ativar_encurtador=config.ATIVAR_ENCURTADOR_DE_LINK,
+    )
 
     print("[3/4] Organizando por categoria...")
     noticias_organizadas = organizar_por_categoria(noticias_selecionadas, config.CATEGORIAS_DE_BUSCA)

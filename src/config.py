@@ -66,6 +66,13 @@ LIMIAR_SIMILARIDADE_TITULO = 0.62
 # - E as datas de publicação estiverem a até X dias de distância
 TOLERANCIA_DIAS_ENTRE_DUPLICATAS = 1
 
+# Encurtador de links: por padrão DESATIVADO. Links encurtados escondem
+# o domínio de destino até o clique -- indesejável para um público que
+# precisa inspecionar o link antes de clicar (ex: risco de phishing).
+# Mude para True somente se preferir links mais curtos e o público não
+# tiver essa preocupação.
+ATIVAR_ENCURTADOR_DE_LINK = False
+
 # Tamanho máximo (em caracteres) de cada "Parte" da mensagem, para não
 # esbarrar no limite de mensagem do WhatsApp
 TAMANHO_MAXIMO_POR_PARTE = 3500
