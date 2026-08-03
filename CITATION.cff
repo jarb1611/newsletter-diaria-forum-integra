@@ -7,7 +7,7 @@ abstract: >-
   newsletter diária para envio via WhatsApp — sem uso de IA generativa
   ou APIs pagas.
 authors:
-  - family-names: "R. Barros"
+  - family-names: "Barros"
     given-names: "João"
 repository-code: "https://github.com/jarb1611/newsletter-diaria-forum-integra"
 url: "https://github.com/jarb1611/newsletter-diaria-forum-integra"

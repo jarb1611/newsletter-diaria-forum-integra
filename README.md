@@ -67,6 +67,7 @@ config.py (categorias, termos, janela de tempo, meta)
 
 - **Janela de tempo:** só considera notícias publicadas dentro de `JANELA_HORAS_MAXIMA` (padrão: 48h). Notícias sem data reconhecível são descartadas por segurança.
 - **Meta de notícias:** a busca **para automaticamente** assim que atingir `META_TOTAL_NOTICIAS` (padrão: 10) — não continua buscando os termos restantes.
+- **Busca em round-robin entre categorias:** a ordem de busca alterna entre categorias (1º termo de cada categoria, depois o 2º termo de cada uma, e assim por diante) em vez de esgotar uma categoria inteira antes de passar para a próxima. Sem isso, como a busca já para ao atingir a meta, a primeira categoria do `config.py` sempre "consumia" toda a meta sozinha, e a newsletter ficava presa no mesmo assunto dominante dia após dia — mesmo com o filtro de duplicatas funcionando perfeitamente.
 - **Encurtamento de link:** feito só nas notícias finais selecionadas (não nas descartadas), usando a API gratuita do TinyURL. Se o serviço estiver fora do ar, o link original é usado sem quebrar o pipeline.
 
 ## Agendamento automático (GitHub Actions)
@@ -171,22 +172,26 @@ https://link-encurtado
 
 Quando você tiver ajustes adicionais no modelo oficial, é só mexer em `src/formatador_whatsapp.py` — a lógica de divisão em partes e organização por categoria continua igual.
 
-## Limitação importante e honesta sobre o filtro de duplicatas
+## Como o filtro de duplicatas identifica o mesmo fato
 
-Sem usar um modelo de linguagem, a detecção de "é a mesma notícia?" depende de:
-1. Datas próximas
-2. Localidade em comum (quando identificável)
-3. Parecença de texto (caractere a caractere) OU sobreposição de palavras-chave centrais
+Sem usar um modelo de linguagem, a detecção de "é a mesma notícia?" cruza:
+1. Datas próximas (tolerância de até 2 dias)
+2. Localidade em comum — reconhece tanto **estados** quanto **principais cidades brasileiras** (ex: "Niterói" é reconhecida como RJ, "Curitiba" como PR)
+3. Parecença de texto caractere a caractere, OU sobreposição de palavras-chave significativas
+4. Uma regra combinada: se a localidade é confirmada igual em ambas E há pelo menos 2 palavras-chave em comum, já é considerado o mesmo fato — mesmo que a redação seja bem diferente
 
-Isso funciona bem para a maioria dos casos, mas **pode deixar passar** duas notícias sobre o mesmo fato se as fontes usarem vocabulário muito diferente e sem palavras-chave em comum suficientes. É a diferença fundamental entre uma abordagem determinística (gratuita) e uma com IA (paga, mas com raciocínio semântico real).
+Para o passo 3 e 4, o filtro remove automaticamente **palavras genéricas do domínio policial** ("polícia", "operação", "prende", "suspeito" etc.) antes de comparar — essas palavras aparecem em quase toda manchete e só atrapalhavam a comparação. Também normaliza sinônimos comuns (ex: "tráfico", "drogas" e "entorpecentes" contam como o mesmo termo; "presídios" e "prisões" também).
 
-**Se isso virar um problema na prática**, o próximo passo natural — ainda gratuito — é usar embeddings locais (biblioteca `sentence-transformers`, roda no seu computador, sem API, sem custo por token) para comparar o *significado* dos títulos em vez de só o texto. Posso implementar isso se notar que o filtro atual está deixando passar duplicatas com frequência.
+Isso resolveu, por exemplo, um caso real em que 5 notícias sobre a mesma operação no Rio de Janeiro (envolvendo drogas e celulares em presídios), escritas de formas bem diferentes por 5 veículos diferentes, apareciam como notícias separadas — agora são corretamente unificadas em uma só.
+
+**Ainda assim, é uma abordagem determinística (gratuita), não semântica de verdade.** Pode, em casos raros, deixar passar duas notícias sobre o mesmo fato se as fontes usarem vocabulário muito diferente e sem palavras-chave específicas em comum. Se isso continuar acontecendo com frequência, o próximo passo — ainda gratuito — é usar embeddings locais (biblioteca `sentence-transformers`, roda no seu computador, sem API, sem custo por token) para comparar o *significado* dos títulos em vez de só o texto.
 
 ## Limitações técnicas do RSS gratuito
 
 - O Google Notícias pode limitar requisições muito frequentes — por isso há uma pausa de 1,5s entre buscas.
 - Nem toda fonte pública tem RSS indexado pelo Google Notícias; a cobertura é ampla, mas não é 100% de tudo que existe na web.
 - Este projeto não roda no ambiente do Claude (sandbox sem acesso à internet geral) — rode na sua própria máquina, onde há acesso normal à web.
+
 
 ## Próximos passos possíveis
 
@@ -208,7 +213,7 @@ Este projeto está sob a licença MIT — veja o arquivo [`LICENSE`](LICENSE) pa
 Se este projeto for referenciado em outro trabalho (acadêmico, técnico ou institucional), a citação sugerida no padrão ABNT é:
 
 ```
-BARROS, João R. Newsletter Diária de Notícias Policiais para WhatsApp. GitHub, 2026.
+BARROS, João. Newsletter Diária de Notícias Policiais para WhatsApp. GitHub, 2026.
 Disponível em: https://github.com/jarb1611/newsletter-diaria-forum-integra.
 Acesso em: [data de acesso].
 ```
